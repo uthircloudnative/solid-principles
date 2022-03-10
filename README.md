@@ -1,6 +1,6 @@
 # java-samples
 
-## SOLID Design Principles
+# SOLID Design Principles
 
   S - **Single Responsibility**. A class/component is have only one reason to change.
   
@@ -220,3 +220,124 @@ public class ReportGenarateReqHandler {
 	}
 }
 ```
+# Liskov's Substitution Principle
+
+ When we are using subclass hierarchies derived classes must be completely substituable it's super class
+ without breaking code.
+ 
+ Ex.
+ 
+   - If superclass method throws any exception then subclass must throw same exception or it should throw
+     derived exception. If it throws any other type then its breaks this rule.
+     
+   - If the base class is defined with int positive member but in sub class require other negative member
+     then its breaking this rule.
+     
+  - This priciple mainly insist importance of when to extend and when to use implements. It's mainly focus on
+     when we define subtype by extending supertype then subtype must have all the behaviours of super type.
+     
+Lets assume we are designing a tool for Software Engineers to do their day today activities.This tool should help 
+any engineer to do following use cases.
+
+    1. Every engineer should be able to log their hours for their activities.
+    2. Every engineer should be able to submit their performance goals.
+    3. Development engineer should be able to assign code review to other engineer.
+    4. Test Engineer can able to share their test scripts.
+    5. Perf Engineer can able to provide performance review comments.
+    
+Lets create a base class Engineer with all this use cases as methods.
+
+```
+
+public abstract class Engineer {
+	
+	public abstract void logHours(float hours);
+	public abstract void submitPerformanceGoals();
+	public abstract void reviewCode();
+	public abstract void shareTestScripts(String assignee);
+	public abstract void givePerformanceReview(String assignee);
+}
+
+```
+ Lets create a **DevelopmentEngineer**  which extend this base class.
+ 
+```
+public class DevlopmentEngineer extends Engineer{
+
+	@Override
+	public void logHours(float hours) {
+		System.out.println("Log Hours");
+	}
+
+	@Override
+	public void submitPerformanceGoals() {
+		System.out.println("Submit Performance Goals");
+		
+	}
+
+	@Override
+	public void reviewCode() {
+		System.out.println("Review Code");
+		
+	}
+
+	@Override
+	public void shareTestScripts(String assignee) {
+		//Developer don't need to shareTest Scripts.
+		 throw new UnsupportedOperationException();
+		
+	}
+
+	@Override
+	public void givePerformanceReview(String assignee) {
+		//PerfEngineer don't need to givePerformanceReview.
+		 throw new UnsupportedOperationException();
+	}
+}
+
+```
+ In the above **DevlopmentEngineer** we have to implement all the abstract methods. But methods **shareTestScripts()**
+ and **givePerformanceReview()** not specific to developer responsibilities so we are throwing exception.
+ 
+ But as per Base **Engineer** class this should have some valid behaviour logically. At this point it's breaking
+ Liskov's Substitution principle. As we won't be able to replace Super class type with Subclass here from logical standpoint.
+ 
+ We can avoid this by splitting these functions acorss multiple **interfaces** or **abstract clasess** by which we can make it 
+ comply with Liskov's Substitution principle.
+ 
+ ```
+ public interface IEngineer {
+	void logHours(float hours);
+	void submitPerformanceGoals();
+}
+
+public interface IDevEngineer {
+	void reviewCode();
+}
+
+public class DevlopmentEngineer implements IEngineer, IDevEngineer{
+
+	@Override
+	public void logHours(float hours) {
+		System.out.println("logHours Implementation");
+	}
+
+	@Override
+	public void submitPerformanceGoals() {
+		System.out.println("submitPerformanceGoals implementation");
+	}
+
+	@Override
+	public void reviewCode() {
+		System.out.println("reviewCode implementation");
+	}
+
+}
+ 
+ ```
+ We have created two interfaces namely **IEngineer**, **IDevEngineer** in which **IEngineer** defines common functions of
+ any Engineer and **IDevEngineer** defines functions only specific to Development Engineers.
+ 
+ By doing this we don't have to worry about functionalities other than given user role like Test and Pef Engineer.
+ This will comply with Liskov's Substitution principle.
+ 
