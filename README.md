@@ -341,3 +341,97 @@ public class DevlopmentEngineer implements IEngineer, IDevEngineer{
  By doing this we don't have to worry about functionalities other than given user role like Test and Pef Engineer.
  This will comply with Liskov's Substitution principle.
  
+# I - Interface Segregation Principle. A client should never forced to implement unused functions/methods. 
+
+  When we expose an interface to a client we should have only methods intended for that clients need in such a way
+  our interface design should be there.
+  
+  Let's assume we are designing a tool for a doctors with following use cases.
+  
+      1. A doctor can able to check a patient.
+      2. A doctor should be able to prescribe medicine.
+      3. A doctor can do/order surgery.
+      
+   Assume we have an interface called **Doctor** with all these 3 functions. And a **PrimaryCareProvider** class implements
+   this **Doctor** interface.
+   
+```
+public interface Doctor {
+	void checkPatient();
+	void prescribeMedicine();
+	void orderSurgery();
+}
+
+public class PrimaryCareProvider implements Doctor{
+
+	@Override
+	public void checkPatient() {
+		System.out.println("checkPatient implementation");
+	}
+
+	@Override
+	public void prescribeMedicine() {
+		System.out.println("prescribeMedicine implementation");
+		
+	}
+
+	@Override
+	public void orderSurgery() {
+		// A Primary Care Doctor can't order for surgery. So this function is not needed
+		//for PrimaryCareProvider but due to Doctor interface this class must implement it.
+	}
+}
+```
+   
+   PrimaryCareProvider can't order surgery but this class is implementing **Doctor** interface it must implement 
+   orderSurgery() this should be avoided.
+   
+   We can introduce two different interface **IDoctor** and **ISurgeon** each of which contains only specific methods relevant
+   to their intended use case.
+   
+```
+public interface IDoctor {
+
+	void checkPatient();
+	void prescribeMedicine();
+}
+
+public interface ISurgeon {
+	void orderSurgery();
+}
+
+public class PrimaryCareProvider implements IDoctor{
+
+	@Override
+	public void checkPatient() {
+		System.out.println("checkPatient implementation");
+	}
+
+	@Override
+	public void prescribeMedicine() {
+		System.out.println("prescribeMedicine implementation");
+	}
+}
+
+public class Surgeon implements IDoctor, ISurgeon{
+
+	@Override
+	public void checkPatient() {
+		System.out.println("checkPatient implementation");
+	}
+
+	@Override
+	public void prescribeMedicine() {
+		System.out.println("prescribeMedicine implementation");
+	}
+
+	@Override
+	public void orderSurgery() {
+		System.out.println("orderSurgery implementation");
+	}
+}
+```
+  From the above samples **PrimaryCareProvider** class will only implements **IDoctor** and implements only basic functions of
+  PrimaryCareProvider.
+  
+  **Surgeon** will implement both **IDoctor** and **ISurgeon** and all the functions of both interface.
