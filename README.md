@@ -1,8 +1,20 @@
-# java-samples
-
 # SOLID Design Principles
 
-  S - **Single Responsibility**. A class/component is have only one reason to change.
+SOLID design principles are software design principles to make code more understandable, flexible, maintainable.
+
+It outlines 5 different principles which makes our component design more maintainable, readable.
+
+    S - Sinlgle Responsibility Principle
+    O - Open/Close Principle
+    L - Liskov's substitution Principle
+    I - Interface Segregation Principle
+    D - Dependecy Inversion Principle
+
+   
+
+## S - Single Responsibility
+
+ A class/component is have only one reason to change.
   
   Lets assume we have following use case. 
     
@@ -107,7 +119,7 @@ public class NotificationService {
 }
  ```
  
- # O - Open / Close Pricipal -> Open for extension closed for modification.
+ ## O - Open / Close Pricipal -> Open for extension closed for modification.
  
      - A class or componenet is open for extension and closed for modfication.
      
@@ -220,7 +232,7 @@ public class ReportGenarateReqHandler {
 	}
 }
 ```
-# Liskov's Substitution Principle
+## Liskov's Substitution Principle
 
  When we are using subclass hierarchies derived classes must be completely substituable it's super class
  without breaking code.
@@ -341,7 +353,9 @@ public class DevlopmentEngineer implements IEngineer, IDevEngineer{
  By doing this we don't have to worry about functionalities other than given user role like Test and Pef Engineer.
  This will comply with Liskov's Substitution principle.
  
-# I - Interface Segregation Principle. A client should never forced to implement unused functions/methods. 
+## I - Interface Segregation Principle. 
+
+A client should never forced to implement unused functions/methods. 
 
   When we expose an interface to a client we should have only methods intended for that clients need in such a way
   our interface design should be there.
@@ -435,3 +449,101 @@ public class Surgeon implements IDoctor, ISurgeon{
   PrimaryCareProvider.
   
   **Surgeon** will implement both **IDoctor** and **ISurgeon** and all the functions of both interface.
+  
+  ## Dependency Inversion Principle
+  
+  High level modules should not depent on low level modules. But both should depent on obstraction.
+  
+  Abstractions should not depent on details but details should depent on abstractions.
+  
+  This principle will empasize loose coupling between components.
+  
+  Let's assume we are developing a calculator which consist of 2 operation add and subtract when two number is given.
+  
+```
+public class AddOperation {
+
+	public int add(int a, int b) {
+		return a+b;
+	}
+}
+
+public class SubtractOperation {
+
+	public int subtract(int a, int b) {
+		return a-b;
+	}
+}
+
+public class Calculator {
+	
+	public enum Operation{
+		ADD, SUBTRACT
+	}
+
+	public int calculate(int a, int b, Operation operation) {
+		int total = 0;
+		if(operation.name().equals("ADD")) {
+			//Tight coupling
+			AddOperation addOperation = new AddOperation();
+			total = addOperation.add(a, b);
+		}else if(operation.name().equals("SUBTRACT")) {
+			//Tight coupling
+			SubtractOperation subOperation = new SubtractOperation();
+			total = subOperation.subtract(a, b);
+		}
+		return total;
+	}
+}
+```
+  Here we have **Calculator** is high level object which depends on **AddOperation** and **SubtractOperation** classes
+  to do add and subtract functions. If any change in these 2 low level class will have direct impact on high level object.
+  
+  To avoid this we can introduce an interface between these two objects which act as contract between them.
+  
+```
+public interface CalculateOperation {
+        int calculate(int a, int b);
+}
+
+public class AddOperation implements CalculateOperation{
+
+	@Override
+	public int calculate(int a, int b) {
+		return a+b;
+	}
+}
+
+public class SubtractOperation implements CalculateOperation{
+
+	@Override
+	public int calculate(int a, int b) {
+		return a-b;
+	}
+}
+
+```
+ **CalculateOperation** will have calculate(int a,int b) method which will be implemented by **AddOperation** and **SubtractOperation**
+ classes. 
+ 
+```
+public class Calculator {
+
+	private CalculateOperation calculateOperation;
+
+	public Calculator(CalculateOperation calculateOperation) {
+		super();
+		this.calculateOperation = calculateOperation;
+	}
+	
+	public int calculate(int a, int b) {
+		return calculateOperation.calculate(a, b);
+	}
+}
+
+```
+ 
+ In the main high level class **Calculator** we will refer given operation using **CalculateOperation** interface instead concrete classes.
+ This will make this code loosly coupled as well as both high and low level objects are independent and they are depnding on abstraction instead.
+ 
+ 
